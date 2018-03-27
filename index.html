@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+  <meta charset="utf-8">
+  <title>Polygon stuff</title>
+  <style>
+    /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+
+    #map {
+      height: 100%;
+    }
+
+    /* Optional: Makes the sample page fill the window. */
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+</head>
+
+<body>
+  <div id="map"></div>
+  <script>
+
+    // This example creates a simple polygon representing the Bermuda Triangle.
+
+    function initMap() {
+      var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 12,
+        center: { lat: 42.140654, lng: 18.994088 },
+        mapTypeId: 'terrain'
+      });
+
+      // Define the LatLng coordinates for the polygon's path.
+      var polyCoords = [
+        { lat: 42.160359, lng: 18.985600 },
+        { lat: 42.138387, lng: 19.006795 },
+        { lat: 42.133652, lng: 19.011903 },
+        { lat: 42.138360, lng: 19.016029 },
+        { lat: 42.140007, lng: 19.017325 },
+        { lat: 42.140213, lng: 19.019176 },
+        { lat: 42.140041, lng: 19.019963 },
+        { lat: 42.140504, lng: 19.020750 },
+        { lat: 42.141191, lng: 19.021861 },
+        { lat: 42.140539, lng: 19.023666 },
+        { lat: 42.139852, lng: 19.024777 },
+        { lat: 42.138868, lng: 19.024370 },
+        { lat: 42.137990, lng: 19.024859 },
+        { lat: 42.137457, lng: 19.025400 },
+        { lat: 42.136765, lng: 19.025773 },
+        { lat: 42.135825, lng: 19.024954 },
+        { lat: 42.127649, lng: 19.014226 },
+        { lat: 42.126663, lng: 18.994998 },
+        { lat: 42.138566, lng: 18.983621 },
+        { lat: 42.160359, lng: 18.985600 },
+      ];
+
+      var poly2Coords = [
+        { lat: 42.134953, lng: 18.852932 },
+        { lat: 42.145176, lng: 18.973353 },
+        { lat: 42.136866, lng: 18.972514 },
+        { lat: 42.099694, lng: 18.854581 },
+        { lat: 42.134953, lng: 18.852932 },
+      ];
+
+      // Construct the polygon.
+      var thePoly = new google.maps.Polygon({
+        paths: polyCoords,
+        strokeColor: '#FF0000',
+        strokeOpacity: 0.8,
+        strokeWeight: 1,
+        fillColor: '#FF0000',
+        fillOpacity: 0.35
+      });
+
+      var thePoly2 = new google.maps.Polygon({
+        paths: poly2Coords,
+        strokeColor: '#FF0000',
+        strokeOpacity: 0.8,
+        strokeWeight: 1,
+        fillColor: '#FF0000',
+        fillOpacity: 0.35
+      });
+
+      var showCoords = function (e) {
+        axios.get(`http://localhost:8080/onwater?lat=${e.latLng.lat()}&lng=${e.latLng.lng()}`)
+          .then(function (resp) {
+            toastr["success"](`Point in:<br>
+              Poly1: ${resp.data.inP1}<br>
+              Poly2: ${resp.data.inP2}`, "Info");
+            console.log(resp.data)
+          })
+          .catch(function (err) {
+            console.error(err);
+          });
+        console.log(e.latLng.lat(), e.latLng.lng());
+      };
+
+      map.addListener('click', showCoords);
+      thePoly.addListener('click', showCoords);
+      thePoly2.addListener('click', showCoords);
+      thePoly.setMap(map);
+      thePoly2.setMap(map);
+    }
+  </script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBIwwsmGD-cqqUiNtEnAnggR0FDfMHN3ow&callback=initMap"></script>
+  <script async defer src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+  <script>
+    toastr.options = {
+      "closeButton": false,
+      "debug": false,
+      "newestOnTop": true,
+      "progressBar": false,
+      "positionClass": "toast-top-right",
+      "preventDuplicates": false,
+      "onclick": null,
+      "showDuration": "300",
+      "hideDuration": "1000",
+      "timeOut": "5000",
+      "extendedTimeOut": "1000",
+      "showEasing": "swing",
+      "hideEasing": "linear",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut"
+    }
+  </script>
+</body>
+
+</html>
